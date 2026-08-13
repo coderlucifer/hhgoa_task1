@@ -166,12 +166,12 @@ export default function HHGoaLanding() {
         
         {/* Structural Bamboo Framing Using Asset */}
         <div 
-          className="w-full relative z-30 h-16 md:h-24 mt-4" 
+          className="w-full relative z-30 h-8 md:h-12 mt-4" 
           style={{ 
-            backgroundImage: "url('/assets/bamboo_with_no_bg.png')",
-            backgroundSize: "100% 100%",
+            backgroundImage: "url('/assets/bamboo-transparent.png')",
+            backgroundSize: "auto 100%",
             backgroundPosition: "center",
-            backgroundRepeat: "no-repeat"
+            backgroundRepeat: "repeat-x"
           }} 
         />
         
@@ -399,12 +399,12 @@ export default function HHGoaLanding() {
       ═══════════════════════════════════════════════════════════════ */}
       <footer className="w-full py-12 text-center relative z-20 bg-hh-navy-dark mt-8">
         <div 
-          className="w-full absolute top-[-20px] md:top-[-30px] left-0 h-16 md:h-24 pointer-events-none" 
+          className="w-full absolute top-[-10px] md:top-[-16px] left-0 h-8 md:h-12 pointer-events-none" 
           style={{ 
-            backgroundImage: "url('/assets/bamboo_with_no_bg.png')",
-            backgroundSize: "100% 100%",
+            backgroundImage: "url('/assets/bamboo-transparent.png')",
+            backgroundSize: "auto 100%",
             backgroundPosition: "center",
-            backgroundRepeat: "no-repeat"
+            backgroundRepeat: "repeat-x"
           }} 
         />
         <p className="font-mono text-hh-sand/40 text-xs tracking-widest uppercase mt-8 md:mt-12">
