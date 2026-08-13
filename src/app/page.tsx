@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
 import { toPng } from 'html-to-image';
-import { X as CloseIcon, ArrowRight, Camera, FolderOpen, ZoomIn } from 'lucide-react';
-import GoaBeachSVG from './components/GoaBeachSVG';
+import { X as CloseIcon, ArrowRight, Camera, UploadCloud, ZoomIn, Download, Share2, FolderOpen } from 'lucide-react';
 
 // ─── Animated Section Wrapper ─────────────────────────────────────────
 function RevealSection({ children, className = '', id = '', sectionNum }: { children: React.ReactNode; className?: string; id?: string; sectionNum?: string }) {
@@ -15,13 +14,13 @@ function RevealSection({ children, className = '', id = '', sectionNum }: { chil
       ref={ref}
       id={id}
       className={`relative ${className}`}
-      initial={{ opacity: 0, y: 40 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
-      transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
+      initial={{ opacity: 0, y: 50 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+      transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
     >
       {sectionNum && (
-        <div className="absolute top-8 left-4 md:left-8 text-[10px] font-mono text-current opacity-30 tracking-widest">
-          {sectionNum} //
+        <div className="absolute top-12 left-6 md:left-12 text-[11px] font-mono text-hh-white/30 tracking-[0.2em] uppercase">
+          [ {sectionNum} ]
         </div>
       )}
       {children}
@@ -54,8 +53,9 @@ export default function HHGoaLanding() {
   const cardRef = useRef<HTMLDivElement>(null);
   
   const { scrollYProgress } = useScroll();
-  const heroY = useTransform(scrollYProgress, [0, 0.5], ['0%', '30%']);
+  const heroY = useTransform(scrollYProgress, [0, 0.5], ['0%', '40%']);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.4], [1, 0]);
+  const sunScale = useTransform(scrollYProgress, [0, 0.5], [1, 1.2]);
 
   // ─── Photo Handlers ──────────────────────
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,7 +75,7 @@ export default function HHGoaLanding() {
   const startCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'user', width: 640, height: 640 } 
+        video: { facingMode: 'user', width: 1080, height: 1080 } 
       });
       streamRef.current = stream;
       if (videoRef.current) {
@@ -96,9 +96,9 @@ export default function HHGoaLanding() {
       const ctx = canvas.getContext('2d');
       if (ctx) {
         ctx.translate(canvas.width, 0);
-        ctx.scale(-1, 1);
+        ctx.scale(-1, 1); // Mirror
         ctx.drawImage(videoRef.current, 0, 0);
-        const dataUrl = canvas.toDataURL('image/png');
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
         setImage(dataUrl);
         setZoom(1);
         setPhotoPos({ x: 0, y: 0 });
@@ -150,7 +150,7 @@ export default function HHGoaLanding() {
   };
 
   const shareToX = () => {
-    const text = encodeURIComponent("I'm heading to Hacker House Goa 2026! 🌴💻 #FrameInGoa");
+    const text = encodeURIComponent("Secured my spot for Hacker House Goa 2026. 🌴💻\n\n#FrameInGoa");
     window.open(`https://twitter.com/intent/tweet?text=${text}`, "_blank");
   };
 
@@ -163,128 +163,135 @@ export default function HHGoaLanding() {
     }
   };
 
-  // Unique ID for the card
-  const [cardId] = useState(() => Math.floor(Math.random() * 9000 + 1000));
+  const [cardId, setCardId] = useState<number | string>('----');
+  useEffect(() => {
+    setCardId(Math.floor(Math.random() * 9000 + 1000));
+  }, []);
 
   return (
-    <div className="bg-hh-green min-h-screen text-hh-white overflow-hidden">
+    <div className="bg-hh-green min-h-screen text-hh-white selection:bg-hh-pink selection:text-white font-sans overflow-x-hidden">
       <div className="noise-overlay" />
 
       {/* ═══════════════════════════════════════════════════════════════
-          01 — HERO: ARRIVE IN GOA
+          01 — HERO: MINIMAL, EDITORIAL, POWERFUL
       ═══════════════════════════════════════════════════════════════ */}
-      <motion.section 
-        style={{ y: heroY, opacity: heroOpacity }}
-        className="relative h-screen w-full flex flex-col items-center justify-center z-10 overflow-hidden"
-      >
-        {/* Goa Beach Illustration Background */}
-        <div className="absolute inset-0 z-0">
-          <GoaBeachSVG className="w-full h-full" />
-        </div>
+      <section className="relative h-screen w-full flex flex-col items-center justify-center overflow-hidden">
+        
+        {/* Abstract Horizon / Sun Background */}
+        <motion.div 
+          style={{ y: heroY, opacity: heroOpacity, scale: sunScale }}
+          className="absolute inset-0 flex flex-col items-center justify-end z-0 pb-[10vh]"
+        >
+          {/* Giant Sun */}
+          <div className="w-[80vw] max-w-[800px] aspect-square rounded-full bg-hh-yellow translate-y-1/2 blur-[1px]" />
+        </motion.div>
+        
+        {/* The Ocean / Horizon Line (Darker bottom half) */}
+        <div className="absolute bottom-0 left-0 right-0 h-[50vh] bg-hh-green-dark/80 backdrop-blur-md z-10 border-t border-white/10" />
 
         {/* Top bar */}
-        <div className="absolute top-0 left-0 right-0 flex justify-between items-center px-6 md:px-12 py-6 z-20">
-          <div className="flex flex-col">
-            <span className="text-hh-yellow font-bold text-xs md:text-sm tracking-[0.15em] uppercase">Goa, India</span>
-            <span className="text-hh-white/60 font-mono text-[10px] md:text-xs tracking-wider">28 - 31 OCT 2026</span>
+        <div className="absolute top-0 left-0 right-0 flex justify-between items-center px-6 md:px-12 py-8 z-20 mix-blend-difference text-white">
+          <div className="flex gap-4 items-center">
+            <span className="font-mono text-xs tracking-widest uppercase">Goa, India</span>
           </div>
-          <div className="flex gap-3">
-            <a href="https://hhgoa.com" target="_blank" rel="noreferrer" className="hidden md:flex text-[10px] font-mono tracking-widest border border-hh-yellow/50 text-hh-yellow px-3 py-1.5 hover:bg-hh-yellow hover:text-hh-black transition-colors uppercase">
+          <div className="flex gap-6 items-center">
+            <a href="https://hhgoa.com" target="_blank" rel="noreferrer" className="hidden md:inline font-mono text-[10px] tracking-widest uppercase hover:text-hh-pink transition-colors">
               hhgoa.com
             </a>
-            <a href="#generator" className="text-[10px] font-mono tracking-widest bg-hh-pink text-white px-4 py-1.5 brutal-border hover:bg-hh-yellow hover:text-hh-black transition-colors uppercase font-bold">
-              Make Yours
+            <a href="#generator" className="font-mono text-[10px] tracking-widest uppercase border border-white/30 px-4 py-2 hover:bg-white hover:text-black transition-all">
+              Initialize
             </a>
           </div>
         </div>
 
-        {/* Central Typography */}
-        <div className="relative z-10 text-center flex flex-col items-center w-full px-4">
-          {/* Staggered hero text */}
-          <div className="overflow-hidden">
+        {/* Hero Typography */}
+        <motion.div 
+          style={{ y: heroY }}
+          className="relative z-20 text-center flex flex-col items-center mt-[-10vh] mix-blend-difference text-white"
+        >
+          <div className="overflow-hidden leading-[0.8] pb-4">
             <motion.h1 
               initial={{ y: '100%' }}
               animate={{ y: '0%' }}
-              transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1], delay: 0.2 }}
-              className="editorial-title text-hh-yellow text-[14vw] md:text-[10rem] lg:text-[13rem] drop-shadow-[0_4px_0_rgba(0,0,0,0.3)]"
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+              className="editorial-display text-[15vw] md:text-[13rem] lg:text-[16rem]"
             >
               HACKER
             </motion.h1>
           </div>
-          <div className="overflow-hidden -mt-[3vw] md:-mt-8">
+          <div className="overflow-hidden leading-[0.8] mt-[-2vw]">
             <motion.h1 
               initial={{ y: '100%' }}
               animate={{ y: '0%' }}
-              transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1], delay: 0.35 }}
-              className="editorial-title text-hh-yellow text-[14vw] md:text-[10rem] lg:text-[13rem] drop-shadow-[0_4px_0_rgba(0,0,0,0.3)]"
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+              className="editorial-display text-[15vw] md:text-[13rem] lg:text-[16rem]"
             >
               HOUSE
             </motion.h1>
           </div>
 
-          {/* Goa badge */}
-          <motion.div 
-            initial={{ scale: 0, rotate: -20 }}
-            animate={{ scale: 1, rotate: -6 }}
-            transition={{ type: "spring", stiffness: 120, damping: 14, delay: 0.6 }}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[45%] z-20 bg-hh-pink px-8 md:px-14 py-2 md:py-4 brutal-border brutal-shadow-lg cursor-default select-none"
-          >
-            <span className="text-hh-yellow text-5xl md:text-8xl font-bold" style={{ fontFamily: '"Comic Sans MS", cursive' }}>
-              गोवा
-            </span>
-          </motion.div>
-
           {/* Sub-headline */}
           <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.2, duration: 0.8 }}
-            className="mt-12 md:mt-16 text-hh-white/80 text-sm md:text-lg font-serif italic max-w-lg"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1, duration: 1 }}
+            className="mt-12 md:mt-16 text-hh-white/70 text-base md:text-xl editorial-italic max-w-lg mx-auto"
           >
-            one photo. one frame. everything in place.
+            One photo. One frame. Everything in place.
           </motion.p>
-        </div>
+        </motion.div>
+
+        {/* Hindi Script Badge - Moved outside the difference blend container so it retains its pure pink color */}
+        <motion.div 
+          style={{ y: heroY }}
+          initial={{ scale: 0, rotate: 10 }}
+          animate={{ scale: 1, rotate: -4 }}
+          transition={{ type: "spring", stiffness: 100, damping: 15, delay: 0.6 }}
+          className="absolute top-[45%] left-1/2 -translate-x-1/2 -translate-y-[60%] z-30 pointer-events-none"
+        >
+          <div className="bg-hh-pink px-8 py-3 transform -skew-x-6 premium-shadow">
+            <span className="text-white text-5xl md:text-7xl font-bold tracking-wider" style={{ fontFamily: '"Arial", sans-serif' }}>
+              गोवा
+            </span>
+          </div>
+        </motion.div>
 
         {/* Scroll hint */}
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1.8, duration: 0.6 }}
-          className="absolute bottom-8 md:bottom-12 flex flex-col items-center z-20"
+          transition={{ delay: 1.5, duration: 1 }}
+          className="absolute bottom-12 flex flex-col items-center z-20"
         >
-          <a href="#generator" className="flex flex-col items-center gap-3 group">
-            <span className="text-[10px] font-mono tracking-[0.2em] uppercase text-hh-white/70 group-hover:text-hh-yellow transition-colors">
-              scroll to create
+          <a href="#generator" className="flex flex-col items-center gap-4 group">
+            <div className="w-[1px] h-12 bg-white/30 group-hover:bg-hh-yellow group-hover:h-16 transition-all duration-500 ease-out" />
+            <span className="text-[10px] font-mono tracking-[0.3em] uppercase text-white/50 group-hover:text-hh-yellow transition-colors">
+              Scroll
             </span>
-            <div className="w-[1px] h-10 bg-hh-yellow/50 group-hover:h-14 transition-all duration-300" />
           </a>
         </motion.div>
-      </motion.section>
+      </section>
 
       {/* ═══════════════════════════════════════════════════════════════
-          02 — MARQUEE TRANSITION
+          02 — MARQUEE TRANSITION (REFINED)
       ═══════════════════════════════════════════════════════════════ */}
-      <section className="relative w-full py-5 bg-hh-yellow text-hh-black z-20 border-y-[3px] border-hh-black overflow-hidden">
+      <section className="relative w-full py-4 bg-hh-yellow text-hh-black z-20 overflow-hidden border-y border-hh-yellow/50">
         <div className="flex whitespace-nowrap">
           <motion.div 
             animate={{ x: ["0%", "-50%"] }}
-            transition={{ repeat: Infinity, duration: 18, ease: "linear" }}
-            className="flex gap-6 items-center"
+            transition={{ repeat: Infinity, duration: 25, ease: "linear" }}
+            className="flex gap-8 items-center"
           >
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="flex gap-6 items-center">
-                <span className="text-xl md:text-2xl font-bold uppercase tracking-widest">28-31 Oct 2026</span>
-                <span className="text-hh-pink text-lg">✦</span>
-                <span className="text-xl md:text-2xl font-bold uppercase tracking-widest">247 Seats</span>
-                <span className="text-hh-pink text-lg">✦</span>
-                <span className="text-xl md:text-2xl font-bold uppercase tracking-widest">#FrameInGoa</span>
-                <span className="text-hh-pink text-lg">✦</span>
-                <span className="text-xl md:text-2xl font-bold uppercase tracking-widest">Less Noise. More Signal.</span>
-                <span className="text-hh-pink text-lg">✦</span>
-                <span className="text-xl md:text-2xl font-bold uppercase tracking-widest">2:47 PM Studio</span>
-                <span className="text-hh-pink text-lg">✦</span>
-                <span className="text-xl md:text-2xl font-bold uppercase tracking-widest">Goa, India</span>
-                <span className="text-hh-pink text-lg">✦</span>
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="flex gap-8 items-center">
+                <span className="text-sm md:text-base font-mono uppercase tracking-[0.2em]">28-31 Oct 2026</span>
+                <span className="text-hh-pink opacity-50">/</span>
+                <span className="text-sm md:text-base font-mono uppercase tracking-[0.2em]">247 Seats</span>
+                <span className="text-hh-pink opacity-50">/</span>
+                <span className="text-sm md:text-base font-mono uppercase tracking-[0.2em]">#FrameInGoa</span>
+                <span className="text-hh-pink opacity-50">/</span>
+                <span className="text-sm md:text-base font-mono uppercase tracking-[0.2em]">Less Noise. More Signal.</span>
+                <span className="text-hh-pink opacity-50">/</span>
               </div>
             ))}
           </motion.div>
@@ -294,72 +301,48 @@ export default function HHGoaLanding() {
       {/* ═══════════════════════════════════════════════════════════════
           03 — GENERATOR SECTION
       ═══════════════════════════════════════════════════════════════ */}
-      <RevealSection id="generator" className="w-full min-h-screen py-20 md:py-32 z-20 bg-[#063d23]" sectionNum="03">
+      <RevealSection id="generator" className="w-full min-h-screen py-24 md:py-32 z-20 bg-hh-green-dark bg-subtle-grid" sectionNum="03">
         <div className="max-w-[1400px] mx-auto px-6 md:px-12">
           
-          {/* Section Header */}
-          <div className="mb-16 md:mb-24 max-w-2xl">
-            <h2 className="text-5xl md:text-7xl font-bold tracking-tight uppercase mb-4 text-hh-white">
-              Create Your<br/>Builder Pass
-            </h2>
-            <p className="text-hh-white/60 text-sm md:text-base max-w-md">
-              Upload a photo, add your details, and get an instant, one-of-a-kind identity card. 
-              Drawn in your browser. Nothing uploaded.
-            </p>
-          </div>
-
-          <div className="flex flex-col lg:flex-row gap-16 lg:gap-20 items-start">
+          <div className="flex flex-col xl:flex-row gap-16 xl:gap-24 items-start">
           
-            {/* LEFT: THE ARTIFACT (Rich Builder Card) */}
-            <div className="w-full lg:w-[55%] flex flex-col items-center lg:sticky lg:top-24">
+            {/* LEFT: THE ARTIFACT (Builder Card) */}
+            <div className="w-full xl:w-[50%] flex flex-col items-center xl:sticky xl:top-24">
               
+              <div className="w-full flex justify-between items-end mb-6 text-hh-white/50 font-mono text-[10px] tracking-widest uppercase">
+                <span>Preview</span>
+                <span>ID: {cardId}</span>
+              </div>
+
               <motion.div 
-                initial={{ opacity: 0, scale: 0.92, rotateY: -5 }}
-                whileInView={{ opacity: 1, scale: 1, rotateY: 0 }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
-                className="w-full max-w-[520px]"
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+                className="w-full max-w-[500px]"
               >
                 {/* THE CARD (Capture Node) */}
                 <div 
                   ref={cardRef} 
-                  className="w-full bg-[#0d6e3c] brutal-border overflow-hidden relative"
-                  style={{ boxShadow: '12px 12px 0 0 #0d0d0d' }}
+                  className="w-full bg-hh-black premium-border overflow-hidden relative card-shadow"
                 >
-                  {/* Diagonal stripe pattern overlay */}
-                  <div className="absolute inset-0 pointer-events-none opacity-[0.07]" style={{
-                    backgroundImage: `repeating-linear-gradient(
-                      -45deg,
-                      transparent,
-                      transparent 10px,
-                      #ffe100 10px,
-                      #ffe100 12px
-                    )`
-                  }} />
+                  {/* Thin Pink Accent Line */}
+                  <div className="w-full h-1 bg-hh-pink" />
 
-                  {/* Pink accent bar */}
-                  <div className="w-full h-2 bg-hh-pink" />
-
-                  {/* Card Header */}
-                  <div className="flex justify-between items-center px-5 py-3 border-b-[3px] border-hh-black bg-hh-green">
+                  {/* Header */}
+                  <div className="flex justify-between items-center px-6 py-4 border-b border-white/10 bg-hh-black">
+                    <div className="editorial-display text-white text-2xl tracking-normal">Hacker House</div>
                     <div className="flex items-center gap-3">
-                      <span className="editorial-title text-hh-yellow text-lg tracking-wider">HACKER HOUSE</span>
-                      <span className="bg-hh-pink text-hh-yellow px-2 py-0.5 text-sm font-bold brutal-border" style={{ fontSize: '14px' }}>गोवा</span>
-                      <span className="text-hh-white font-bold text-sm">2026</span>
+                      <span className="font-sans font-bold text-hh-yellow text-sm tracking-widest">2026</span>
+                      <div className="w-1.5 h-1.5 rounded-full bg-hh-pink" />
                     </div>
                   </div>
 
-                  {/* Event sub-header */}
-                  <div className="flex justify-between items-center px-5 py-2 border-b border-hh-black/30 text-[10px] font-mono text-hh-yellow/70 tracking-widest uppercase bg-hh-green/50">
-                    <span>GOA, INDIA · 28-31 Oct 2026</span>
-                    <span>Open Trials · HHGOA'26</span>
-                  </div>
-
-                  {/* Main Content: Photo + Info */}
-                  <div className="flex flex-col md:flex-row">
-                    {/* Photo */}
+                  {/* Main Grid Content */}
+                  <div className="p-6">
+                    {/* Photo Area */}
                     <div 
-                      className="w-full md:w-[45%] aspect-square bg-hh-black/20 border-r-0 md:border-r-[3px] border-b-[3px] md:border-b-0 border-hh-black overflow-hidden relative cursor-move"
+                      className="w-full aspect-[4/3] bg-[#111] border border-white/5 overflow-hidden relative cursor-move mb-6"
                       onPointerDown={handlePointerDown}
                       onPointerMove={handlePointerMove}
                       onPointerUp={handlePointerUp}
@@ -377,72 +360,71 @@ export default function HHGoaLanding() {
                           draggable={false}
                         />
                       ) : (
-                        <div className="absolute inset-0 flex flex-col items-center justify-center text-hh-white/30 gap-2 p-4">
-                          <div className="w-16 h-16 border-2 border-dashed border-hh-white/20 rounded-full flex items-center justify-center">
-                            <span className="text-2xl">📷</span>
-                          </div>
-                          <span className="font-mono text-[10px] uppercase tracking-widest text-center">Upload Your<br/>Photo</span>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center text-white/20">
+                          <UploadCloud size={32} strokeWidth={1} className="mb-4" />
+                          <span className="font-mono text-[10px] uppercase tracking-widest">Awaiting Visual Data</span>
                         </div>
                       )}
-                      {/* Open Trials Badge */}
-                      <div className="absolute bottom-3 left-3 bg-hh-green/90 brutal-border px-3 py-1.5 backdrop-blur-sm">
-                        <div className="text-[9px] font-mono text-hh-yellow tracking-widest uppercase">Open Trials</div>
-                        <div className="text-hh-white font-bold text-xl leading-none">247 <span className="text-xs font-normal">SEATS</span></div>
+                      
+                      {/* Photo overlay badge */}
+                      <div className="absolute bottom-4 right-4 bg-black/50 backdrop-blur-md px-3 py-1.5 border border-white/10">
+                        <span className="text-[9px] font-mono text-hh-yellow uppercase tracking-widest">Verified</span>
                       </div>
                     </div>
 
-                    {/* Identity Info */}
-                    <div className="w-full md:w-[55%] p-5 md:p-6 flex flex-col justify-between bg-hh-green/40 min-h-[200px]">
+                    {/* Identity Data */}
+                    <div className="flex flex-col gap-4">
                       <div>
-                        <h2 className="text-3xl md:text-4xl font-bold text-hh-white uppercase tracking-tight leading-none mb-4 break-words" style={{ wordBreak: 'break-word' }}>
-                          {name || 'Your Name'}
+                        <div className="text-[9px] font-mono text-white/40 uppercase tracking-[0.2em] mb-1">Identity</div>
+                        <h2 className="text-3xl font-sans font-bold text-white uppercase tracking-tight leading-none break-words">
+                          {name || 'ANONYMOUS'}
                         </h2>
-                        <div className="w-full h-[2px] bg-hh-white/20 mb-4" />
-                        
-                        {activeTab === 'BUILDER' && (
-                          <div className="flex flex-col gap-3">
-                            <div>
-                              <span className="text-[9px] font-mono text-hh-yellow/80 uppercase tracking-widest">— Stack / Role</span>
-                              <p className="text-hh-white/80 text-sm font-mono mt-0.5">{role || 'your stack'}</p>
-                            </div>
-                            <div>
-                              <span className="text-[9px] font-mono text-hh-yellow/80 uppercase tracking-widest">— Builder Class</span>
-                              <p className="text-hh-white/80 text-sm font-mono mt-0.5">{title || 'your title'}</p>
-                            </div>
+                      </div>
+                      
+                      {activeTab === 'BUILDER' && (
+                        <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/10">
+                          <div>
+                            <div className="text-[9px] font-mono text-white/40 uppercase tracking-[0.2em] mb-1">Stack / Role</div>
+                            <div className="text-sm font-mono text-white/90">{role || '—'}</div>
                           </div>
-                        )}
-                      </div>
-
-                      {/* Card date */}
-                      <div className="mt-6 text-[9px] font-mono text-hh-white/40 uppercase tracking-widest">
-                        GOA, INDIA · 28-31 OCT 2026
-                      </div>
+                          <div>
+                            <div className="text-[9px] font-mono text-white/40 uppercase tracking-[0.2em] mb-1">Class</div>
+                            <div className="text-sm font-mono text-white/90">{title || '—'}</div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
 
-                  {/* Card Footer / Promo Bar */}
-                  <div className="flex items-center justify-between px-5 py-2.5 bg-hh-black border-t-[3px] border-hh-black text-[10px] font-mono tracking-widest">
-                    <div className="flex items-center gap-2">
-                      <span className="bg-hh-yellow text-hh-black px-1.5 py-0.5 font-bold">#FrameInGoa</span>
-                      <span className="text-hh-white/40">MAKE YOURS →</span>
+                  {/* Barcode & Footer */}
+                  <div className="px-6 pb-6 pt-2 flex items-end justify-between">
+                    <div className="w-1/2 opacity-50">
+                      <div className="barcode" />
+                      <div className="text-[8px] font-mono text-white/50 mt-1 tracking-widest">HHG-26-ID</div>
                     </div>
-                    <div className="flex items-center gap-3 text-hh-white/40">
-                      <span>GOA, INDIA · 28-31 OCT 2026</span>
-                      <span className="hidden md:inline">· HHGOA.COM</span>
+                    <div className="text-right">
+                      <div className="text-[9px] font-mono text-hh-pink uppercase tracking-widest mb-1">Open Trials</div>
+                      <div className="text-[9px] font-mono text-white/40 uppercase tracking-[0.1em]">Goa, India</div>
                     </div>
+                  </div>
+
+                  {/* Promo Footer Line */}
+                  <div className="w-full bg-hh-yellow text-hh-black py-1.5 px-6 flex justify-between items-center text-[8px] font-mono uppercase tracking-[0.2em] font-bold">
+                    <span>#FrameInGoa</span>
+                    <span>hhgoa.com</span>
                   </div>
                 </div>
               </motion.div>
 
-              {/* Zoom Slider + Drag hint (below card) */}
+              {/* Zoom Slider */}
               {image && (
                 <motion.div 
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mt-6 w-full max-w-[520px] flex flex-col gap-3"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="mt-8 w-full max-w-[500px] flex flex-col gap-4"
                 >
-                  <div className="flex items-center gap-4">
-                    <ZoomIn size={14} className="text-hh-white/40 shrink-0" />
+                  <div className="flex items-center gap-4 px-4">
+                    <ZoomIn size={14} className="text-white/30 shrink-0" />
                     <input 
                       type="range" 
                       min="1" 
@@ -450,80 +432,73 @@ export default function HHGoaLanding() {
                       step="0.05"
                       value={zoom}
                       onChange={e => setZoom(parseFloat(e.target.value))}
-                      className="w-full accent-hh-yellow h-1 bg-hh-white/10 appearance-none rounded-full cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-hh-yellow [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-hh-black [&::-webkit-slider-thumb]:cursor-pointer"
+                      className="w-full accent-white h-0.5 bg-white/10 appearance-none rounded-full cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full"
                     />
                   </div>
-                  <p className="text-[10px] font-mono text-hh-white/30 uppercase tracking-widest text-center">
-                    Drag to reposition · scroll to zoom
+                  <p className="text-[10px] font-mono text-white/30 uppercase tracking-[0.2em] text-center">
+                    Drag photo to reposition
                   </p>
                 </motion.div>
               )}
-
             </div>
 
-            {/* RIGHT: THE CONTROLS */}
-            <div className="w-full lg:w-[45%] flex flex-col">
+            {/* RIGHT: THE TERMINAL (Controls) */}
+            <div className="w-full xl:w-[50%] flex flex-col xl:pt-8">
               
               {/* Mode Switcher */}
-              <div className="flex gap-3 mb-8">
+              <div className="flex gap-4 mb-10 border-b border-white/10 pb-4">
                 <button 
                   onClick={() => setActiveTab('BUILDER')}
-                  className={`px-5 py-2.5 font-bold text-xs uppercase tracking-wider transition-all brutal-border ${activeTab === 'BUILDER' ? 'bg-hh-pink text-hh-white brutal-shadow' : 'bg-hh-black/40 text-hh-white/60 hover:bg-hh-black/60'}`}
+                  className={`text-xs font-mono uppercase tracking-[0.15em] transition-colors pb-4 -mb-[17px] ${activeTab === 'BUILDER' ? 'text-hh-yellow border-b-2 border-hh-yellow' : 'text-white/40 hover:text-white/70'}`}
                 >
                   Builder ID
                 </button>
                 <button 
                   onClick={() => setActiveTab('PFP')}
-                  className={`px-5 py-2.5 font-bold text-xs uppercase tracking-wider transition-all brutal-border ${activeTab === 'PFP' ? 'bg-hh-pink text-hh-white brutal-shadow' : 'bg-hh-black/40 text-hh-white/60 hover:bg-hh-black/60'}`}
+                  className={`text-xs font-mono uppercase tracking-[0.15em] transition-colors pb-4 -mb-[17px] ${activeTab === 'PFP' ? 'text-hh-yellow border-b-2 border-hh-yellow' : 'text-white/40 hover:text-white/70'}`}
                 >
                   PFP Frame
                 </button>
               </div>
 
-              {/* Upload Section */}
-              <div className="mb-8">
-                <span className="text-hh-pink text-xs font-bold uppercase tracking-widest mb-3 block">Upload</span>
-                <h3 className="text-2xl font-bold uppercase mb-4">Photo</h3>
+              {/* Upload Actions */}
+              <div className="mb-10">
+                <div className="text-[10px] font-mono text-white/40 uppercase tracking-[0.2em] mb-4">Input Data // Visual</div>
                 
-                <div className="flex gap-3 mb-3">
+                <div className="grid grid-cols-2 gap-4">
                   <button 
                     onClick={() => fileInputRef.current?.click()}
-                    className="flex items-center gap-2 bg-hh-pink text-white px-5 py-3 brutal-border brutal-shadow-hover font-bold text-xs uppercase tracking-wider"
+                    className="flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white py-4 font-mono text-xs uppercase tracking-[0.1em] transition-colors"
                   >
-                    <FolderOpen size={16} /> {image ? 'Replace' : 'Browse'}
+                    <FolderOpen size={14} /> {image ? 'Replace' : 'Upload'}
                   </button>
                   <button 
                     onClick={startCamera}
-                    className="flex items-center gap-2 bg-hh-white text-hh-black px-5 py-3 brutal-border brutal-shadow-hover font-bold text-xs uppercase tracking-wider"
+                    className="flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white py-4 font-mono text-xs uppercase tracking-[0.1em] transition-colors"
                   >
-                    <Camera size={16} /> Selfie
+                    <Camera size={14} /> Selfie
                   </button>
                 </div>
                 <input type="file" ref={fileInputRef} onChange={handleImageUpload} accept="image/jpeg,image/png,image/heic,image/webp" className="hidden" />
-                <p className="text-[10px] text-hh-white/40 font-mono uppercase tracking-wider">
-                  JPG · PNG · WebP · HEIC — straight from your phone.
-                </p>
               </div>
 
               {/* Terminal Panel */}
-              <div className="dev-terminal-panel rounded-lg p-5 md:p-6 flex flex-col gap-5 w-full max-w-[500px]">
+              <div className="dev-terminal-panel p-6 md:p-8 flex flex-col gap-6 w-full max-w-[550px]">
                 
-                <div className="flex items-center gap-2 mb-1">
-                  <div className="w-3 h-3 rounded-full bg-[#ff5f56]" />
-                  <div className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
-                  <div className="w-3 h-3 rounded-full bg-[#27c93f]" />
-                  <span className="ml-3 text-[#666] text-[10px] font-mono tracking-widest uppercase">hh-goa-cli v2.0.26</span>
+                <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-2">
+                  <span className="text-white/30 text-[10px] font-mono tracking-[0.2em] uppercase">Terminal</span>
+                  <span className="text-hh-pink text-[10px] font-mono tracking-[0.2em] uppercase">v2.0.26</span>
                 </div>
 
                 {/* Name */}
-                <div className="flex flex-col gap-1 border-b border-white/10 pb-3 focus-within:border-white/25 transition-colors">
-                  <span className="text-[#777] text-[11px] font-mono">~/hh-goa $ <span className="text-[#7eb8a8]">set</span> name</span>
+                <div className="flex flex-col gap-2">
+                  <span className="text-white/40 text-[10px] font-mono tracking-widest uppercase">{'>'} NAME:</span>
                   <input 
                     type="text" 
                     value={name}
                     onChange={e => setName(e.target.value)}
-                    className="dev-input text-base md:text-lg" 
-                    placeholder="your name..." 
+                    className="dev-input text-lg md:text-xl py-2 border-b border-white/10 focus:border-hh-yellow transition-colors" 
+                    placeholder="_" 
                     maxLength={20}
                   />
                 </div>
@@ -531,27 +506,27 @@ export default function HHGoaLanding() {
                 {activeTab === 'BUILDER' && (
                   <>
                     {/* Role */}
-                    <div className="flex flex-col gap-1 border-b border-white/10 pb-3 focus-within:border-white/25 transition-colors">
-                      <span className="text-[#777] text-[11px] font-mono">~/hh-goa $ <span className="text-[#7eb8a8]">set</span> stack</span>
+                    <div className="flex flex-col gap-2 mt-2">
+                      <span className="text-white/40 text-[10px] font-mono tracking-widest uppercase">{'>'} STACK_ROLE:</span>
                       <input 
                         type="text" 
                         value={role}
                         onChange={e => setRole(e.target.value)}
-                        className="dev-input text-base md:text-lg" 
-                        placeholder="e.g. Rust · zk · backend" 
+                        className="dev-input text-lg md:text-xl py-2 border-b border-white/10 focus:border-hh-yellow transition-colors" 
+                        placeholder="_" 
                         maxLength={30}
                       />
                     </div>
 
                     {/* Title */}
-                    <div className="flex flex-col gap-1 border-b border-white/10 pb-3 focus-within:border-white/25 transition-colors">
-                      <span className="text-[#777] text-[11px] font-mono">~/hh-goa $ <span className="text-[#7eb8a8]">set</span> title</span>
+                    <div className="flex flex-col gap-2 mt-2">
+                      <span className="text-white/40 text-[10px] font-mono tracking-widest uppercase">{'>'} BUILDER_TITLE:</span>
                       <input 
                         type="text" 
                         value={title}
                         onChange={e => setTitle(e.target.value)}
-                        className="dev-input text-base md:text-lg" 
-                        placeholder="e.g. Code Pirate" 
+                        className="dev-input text-lg md:text-xl py-2 border-b border-white/10 focus:border-hh-yellow transition-colors" 
+                        placeholder="_" 
                         maxLength={25}
                       />
                     </div>
@@ -559,19 +534,15 @@ export default function HHGoaLanding() {
                 )}
 
                 {/* Compile Button */}
-                <div className="pt-3">
+                <div className="pt-8">
                   <button 
                     onClick={handleGenerate}
                     disabled={!image || isGenerating}
-                    className="w-full bg-hh-pink text-white py-4 brutal-border brutal-shadow-hover font-bold text-sm uppercase tracking-widest flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="w-full bg-white text-black py-4 font-mono font-bold text-xs uppercase tracking-[0.2em] flex items-center justify-center gap-3 disabled:opacity-20 disabled:cursor-not-allowed hover:bg-hh-yellow transition-colors"
                   >
-                    {isGenerating ? 'Generating...' : 'Generate My Pass'} <ArrowRight size={16} />
+                    {isGenerating ? '[ Compiling... ]' : '[ Execute Build ]'} <ArrowRight size={14} />
                   </button>
                 </div>
-
-                <p className="text-[10px] text-[#555] font-mono text-center uppercase tracking-wider">
-                  No account · nothing uploaded · #FrameInGoa
-                </p>
               </div>
             </div>
           </div>
@@ -581,17 +552,17 @@ export default function HHGoaLanding() {
       {/* ═══════════════════════════════════════════════════════════════
           04 — FOOTER CTA
       ═══════════════════════════════════════════════════════════════ */}
-      <RevealSection className="w-full py-24 md:py-32 bg-hh-black text-hh-white z-20 text-center" sectionNum="04">
-        <div className="max-w-2xl mx-auto px-8">
-          <h2 className="editorial-title text-hh-yellow text-5xl md:text-7xl mb-6">See You<br/>In Goa.</h2>
-          <p className="text-hh-white/50 font-mono text-xs md:text-sm uppercase tracking-widest mb-10">
-            28-31 Oct 2026 · 247 Seats · Builders Only
+      <RevealSection className="w-full py-32 bg-hh-black text-hh-white z-20 text-center" sectionNum="04">
+        <div className="max-w-3xl mx-auto px-8">
+          <h2 className="editorial-display text-white text-6xl md:text-8xl mb-8">See You<br/>In Goa.</h2>
+          <p className="text-white/40 font-mono text-[10px] md:text-xs uppercase tracking-[0.3em] mb-12">
+            28-31 Oct 2026 / 247 Seats / Open Trials
           </p>
           <a 
             href="#generator" 
-            className="inline-flex items-center gap-3 bg-hh-pink text-white px-8 py-4 brutal-border brutal-shadow-hover font-bold uppercase tracking-widest"
+            className="inline-flex items-center gap-4 bg-hh-pink text-white px-8 py-4 font-mono text-xs uppercase tracking-[0.2em] hover:bg-white hover:text-black transition-colors"
           >
-            Create Your Pass <ArrowRight size={18} />
+            Deploy Identity <ArrowRight size={14} />
           </a>
         </div>
       </RevealSection>
@@ -600,12 +571,16 @@ export default function HHGoaLanding() {
           SELFIE CAMERA MODAL
       ═══════════════════════════════════════════════════════════════ */}
       {showCamera && (
-        <div className="fixed inset-0 z-50 bg-hh-black/95 flex flex-col items-center justify-center p-6">
-          <button onClick={stopCamera} className="absolute top-6 right-6 text-hh-white/50 hover:text-white">
-            <CloseIcon size={28} />
+        <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center p-6">
+          <button onClick={stopCamera} className="absolute top-8 right-8 text-white/50 hover:text-white transition-colors">
+            <CloseIcon size={24} />
           </button>
-          <h3 className="text-hh-yellow font-bold text-lg uppercase tracking-widest mb-6">Take a Selfie</h3>
-          <div className="w-full max-w-[400px] aspect-square brutal-border overflow-hidden bg-hh-black mb-6 relative">
+          
+          <div className="text-[10px] font-mono text-white/40 uppercase tracking-[0.3em] mb-8">
+            [ Camera Interface ]
+          </div>
+
+          <div className="w-full max-w-[480px] aspect-[4/3] bg-[#111] border border-white/10 mb-8 relative overflow-hidden">
             <video 
               ref={videoRef} 
               autoPlay 
@@ -614,12 +589,20 @@ export default function HHGoaLanding() {
               className="w-full h-full object-cover" 
               style={{ transform: 'scaleX(-1)' }}
             />
+            {/* Camera reticle */}
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute top-4 left-4 w-4 h-4 border-t border-l border-white/50" />
+              <div className="absolute top-4 right-4 w-4 h-4 border-t border-r border-white/50" />
+              <div className="absolute bottom-4 left-4 w-4 h-4 border-b border-l border-white/50" />
+              <div className="absolute bottom-4 right-4 w-4 h-4 border-b border-r border-white/50" />
+            </div>
           </div>
+
           <button 
             onClick={capturePhoto}
-            className="bg-hh-pink text-white px-8 py-4 brutal-border brutal-shadow-hover font-bold uppercase tracking-widest flex items-center gap-2"
+            className="bg-white text-black px-12 py-4 font-mono font-bold text-xs uppercase tracking-[0.2em] flex items-center gap-3 hover:bg-hh-yellow transition-colors"
           >
-            <Camera size={18} /> Snap
+            <Camera size={14} /> Capture
           </button>
         </div>
       )}
@@ -628,39 +611,38 @@ export default function HHGoaLanding() {
           GENERATED IMAGE OVERLAY
       ═══════════════════════════════════════════════════════════════ */}
       {generatedImage && (
-        <div className="fixed inset-0 z-50 bg-hh-black/95 flex flex-col items-center justify-center p-6 md:p-12 overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-hh-green-dark/95 backdrop-blur-xl flex flex-col items-center justify-center p-6 md:p-12 overflow-y-auto">
           <button 
             onClick={() => setGeneratedImage(null)} 
-            className="absolute top-6 right-6 md:top-10 md:right-10 w-10 h-10 bg-hh-yellow brutal-border brutal-shadow-hover flex items-center justify-center text-hh-black z-10"
+            className="absolute top-8 right-8 text-white/50 hover:text-white transition-colors z-10"
           >
-            <CloseIcon strokeWidth={3} size={18} />
+            <CloseIcon size={24} />
           </button>
 
           <motion.div 
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: [0.25, 1, 0.5, 1] }}
-            className="flex flex-col items-center max-w-[550px] w-full"
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            className="flex flex-col items-center max-w-[500px] w-full"
           >
-            <h3 className="editorial-title text-hh-yellow text-4xl md:text-5xl mb-8 text-center">Identity<br/>Secured ✦</h3>
+            <h3 className="editorial-display text-white text-5xl md:text-6xl mb-12 text-center">Identity<br/><span className="text-hh-yellow italic">Compiled</span></h3>
             
-            <div className="relative w-full mb-10">
-              <img src={generatedImage} alt="Generated Pass" className="w-full h-auto brutal-border brutal-shadow-lg" />
+            <div className="relative w-full mb-12 premium-shadow">
+              <img src={generatedImage} alt="Generated Pass" className="w-full h-auto border border-white/10" />
             </div>
             
-            <div className="flex flex-col sm:flex-row gap-4 w-full max-w-[420px]">
+            <div className="flex flex-col sm:flex-row gap-4 w-full">
               <button 
                 onClick={downloadImage}
-                className="flex-1 bg-hh-white text-hh-black brutal-border brutal-shadow-hover py-4 font-bold uppercase tracking-wider text-center text-sm"
+                className="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 text-white py-4 font-mono text-xs uppercase tracking-[0.1em] transition-colors flex items-center justify-center gap-2"
               >
-                Download
+                <Download size={14} /> Download
               </button>
               <button 
                 onClick={shareToX}
-                className="flex-1 bg-hh-pink text-hh-white brutal-border brutal-shadow-hover py-4 font-bold uppercase tracking-wider text-center text-sm flex items-center justify-center gap-2"
+                className="flex-1 bg-hh-yellow hover:bg-white text-black py-4 font-mono text-xs font-bold uppercase tracking-[0.1em] transition-colors flex items-center justify-center gap-2"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4l11.733 16h4.267l-11.733 -16z" /><path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772" /></svg>
-                Share to X
+                <Share2 size={14} /> Share to X
               </button>
             </div>
           </motion.div>
