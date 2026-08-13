@@ -121,42 +121,64 @@ export default function HHGoaLanding() {
       {/* ═══════════════════════════════════════════════════════════════
           01 — ARRIVE IN GOA (Hero Section)
       ═══════════════════════════════════════════════════════════════ */}
-      <section className="relative w-full h-[80vh] md:h-[90vh] overflow-hidden flex flex-col items-center justify-center">
-        <Stars />
+      <section className="relative w-full overflow-hidden flex flex-col items-center justify-start bg-hh-navy">
         
-        {/* Immersive Master Background with subtle parallax */}
-        <motion.div 
-          className="absolute inset-0 z-0 bg-cover bg-center"
-          style={{ 
-            backgroundImage: 'url(/master-bg.png)',
-            x: mousePos.x * -1,
-            y: mousePos.y * -1,
-            scale: 1.05
-          }}
-        />
-        
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-hh-navy z-10 pointer-events-none" />
+        {/* Aspect Ratio Preserving Image Container */}
+        <div className="relative w-full max-w-[1920px] mx-auto">
+          {/* Base Background Image */}
+          <motion.img 
+            src="/assets/master-bg.png" 
+            alt="Goa Hacker House Night"
+            className="w-full h-auto block"
+            style={{ 
+              x: mousePos.x * -0.5,
+              y: mousePos.y * -0.5,
+              scale: 1.02
+            }}
+          />
 
-        {/* Floating Call to Action in the environment */}
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1, duration: 1 }}
-          className="relative z-20 mt-[30vh] md:mt-[40vh] text-center px-4"
-        >
-          <h2 className="editorial-display text-4xl md:text-6xl text-hh-yellow drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)] mb-4">
-            BUILD YOUR HH GOA IDENTITY
-          </h2>
-          <p className="font-mono text-sm md:text-base text-hh-sand/80 mb-8 max-w-lg mx-auto drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
-            Upload your photo. Build your builder identity. Take it to Goa.
-          </p>
-          <button 
-            onClick={() => document.getElementById('generator')?.scrollIntoView({ behavior: 'smooth' })}
-            className="vector-box-pink px-8 py-4 font-mono text-sm uppercase tracking-widest hover:scale-105 transition-transform"
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-hh-navy z-10 pointer-events-none" />
+
+          {/* HACKER HOUSE Logo - Absolutely positioned relative to the image */}
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1 }}
+            className="absolute top-[8%] left-1/2 -translate-x-1/2 w-[60%] max-w-2xl z-20 pointer-events-none"
           >
-            CREATE YOUR BUILDER ID →
-          </button>
-        </motion.div>
+            <img src="/assets/logo.png" alt="Hacker House Goa" className="w-full h-auto drop-shadow-2xl" />
+          </motion.div>
+
+          {/* Floating Call to Action - Perfectly aligned to the yellow sign */}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.5, duration: 0.8 }}
+            className="absolute top-[57%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 text-center w-[40%] max-w-xl flex flex-col items-center justify-center"
+          >
+            <h2 className="editorial-display text-[2vw] md:text-3xl lg:text-5xl text-[#080914] mb-1 font-bold w-full leading-none drop-shadow-none whitespace-nowrap">
+              CODE AT THE BEACH
+            </h2>
+            <p className="font-mono text-[0.8vw] md:text-[10px] lg:text-xs text-[#080914]/80 font-bold tracking-widest uppercase mt-1 md:mt-2">
+              Upload your photo. Claim your spot.
+            </p>
+          </motion.div>
+          
+          {/* Button pushed down below the yellow sign */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1, duration: 0.8 }}
+            className="absolute top-[72%] left-1/2 -translate-x-1/2 z-20"
+          >
+            <button 
+              onClick={() => document.getElementById('generator')?.scrollIntoView({ behavior: 'smooth' })}
+              className="vector-box-pink px-4 py-2 md:px-8 md:py-4 font-mono text-[10px] md:text-sm uppercase tracking-widest hover:scale-105 transition-transform shadow-2xl shadow-hh-pink/20 whitespace-nowrap"
+            >
+              INITIALIZE GENERATOR →
+            </button>
+          </motion.div>
+        </div>
       </section>
 
       {/* ═══════════════════════════════════════════════════════════════
