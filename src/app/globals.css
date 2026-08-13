@@ -1,38 +1,137 @@
 @import "tailwindcss";
 
-:root {
-  --background: #050505;
-  --foreground: #ededed;
+@theme inline {
+  --color-hh-green: #0d6e3c;
+  --color-hh-yellow: #ffe100;
+  --color-hh-pink: #ff007f;
+  --color-hh-black: #0d0d0d;
+  --color-hh-wood: #e3bc82;
+  --color-hh-white: #fdfbf7;
+  
+  --font-serif: "Georgia", "Times New Roman", serif;
+  --font-sans: "Inter", "Helvetica Neue", sans-serif;
+  --font-mono: "Menlo", "Monaco", "Courier New", monospace;
+  --font-script: "Brush Script MT", "Comic Sans MS", cursive;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-hh-green: #39ff14;
-  --color-hh-yellow: #fde047;
-  --color-hh-pink: #ff2a85;
-  --animate-gradient-x: gradient-x 3s ease infinite;
-
-  @keyframes gradient-x {
-    0%, 100% {
-      background-size: 200% 200%;
-      background-position: left center;
-    }
-    50% {
-      background-size: 200% 200%;
-      background-position: right center;
-    }
-  }
+:root {
+  --background: #0d6e3c;
+  --foreground: #fdfbf7;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
-.bg-grid-pattern {
+/* Custom Text Selection */
+::selection {
+  background: var(--color-hh-pink);
+  color: #fff;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-hh-green);
+  border-left: 2px solid var(--color-hh-black);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-hh-yellow);
+  border: 2px solid var(--color-hh-black);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-hh-pink);
+}
+
+/* Neo-brutalism / Flat Illustration Utilities */
+.brutal-border {
+  border: 3px solid var(--color-hh-black);
+}
+.brutal-shadow {
+  box-shadow: 6px 6px 0 0 var(--color-hh-black);
+}
+.brutal-shadow {
+  box-shadow: 4px 4px 0 0 var(--color-hh-black);
+}
+.brutal-shadow-lg {
+  box-shadow: 12px 12px 0 0 var(--color-hh-black);
+}
+.brutal-shadow-hover {
+  transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.brutal-shadow-hover:hover {
+  transform: translate(-4px, -4px);
+  box-shadow: 10px 10px 0 0 var(--color-hh-black);
+}
+.brutal-shadow-hover:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 0 var(--color-hh-black);
+}
+
+/* Editorial Typography */
+.editorial-title {
+  font-family: var(--font-serif);
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 0.8;
+  letter-spacing: -0.02em;
+}
+
+.text-stroke-yellow {
+  color: transparent;
+  -webkit-text-stroke: 2px var(--color-hh-yellow);
+}
+
+/* Noise Texture Overlay */
+.noise-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0.04;
+  background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noiseFilter)"/></svg>');
+}
+
+/* Subtle Grid Background for sections */
+.bg-subtle-grid {
   background-size: 40px 40px;
-  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-image: 
+    linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+}
+
+/* Developer Terminal Inputs (Muted, Sophisticated) */
+.dev-terminal-panel {
+  background-color: #1a1e1c;
+  border: 2px solid rgba(255,255,255,0.1);
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+  font-family: var(--font-mono);
+}
+.dev-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #e0e0e0;
+  font-family: var(--font-mono);
+  width: 100%;
+}
+.dev-input::placeholder {
+  color: #555;
+}
+.dev-cursor::after {
+  content: '█';
+  animation: dev-blink 1.2s step-end infinite;
+  color: #666;
+  margin-left: 4px;
+}
+@keyframes dev-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
